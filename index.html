@@ -179,6 +179,11 @@
             <label for="apiToken">ApiTokenInstance</label>
             <input id="apiToken" name="apiToken" placeholder="Ваш ApiTokenInstance" autocomplete="off" />
           </div>
+          <div>
+            <label for="proxyBase">Proxy (для обхода CORS, опционально)</label>
+            <input id="proxyBase" name="proxyBase" placeholder="например, https://green-proxy.vercel.app/api" autocomplete="off" />
+            <div class="hint">Если оставить пустым — запрос идёт напрямую на api.green-api.com</div>
+          </div>
           <div class="row">
             <button id="btnSettings" type="button">getSettings</button>
             <button id="btnState" type="button">getStateInstance</button>
@@ -230,6 +235,7 @@
     const el = (id) => document.getElementById(id);
     const idInput = el('idInstance');
     const tokenInput = el('apiToken');
+    const proxyInput = el('proxyBase');
     const respBox = el('response');
     const statusLabel = el('statusLabel');
 
@@ -264,10 +270,14 @@
       statusLabel.textContent = msg || '';
     };
 
+    const normalizeProxy = (val) => val.replace(/\/$/, '');
+
     const baseUrl = () => {
       const id = idInput.value.trim();
       const token = tokenInput.value.trim();
       if (!id || !token) throw new Error('Заполните idInstance и ApiTokenInstance');
+      const proxy = proxyInput.value.trim();
+      if (proxy) return `${normalizeProxy(proxy)}/waInstance${id}`;
       return `https://api.green-api.com/waInstance${id}`;
     };
 
