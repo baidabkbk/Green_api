@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>GREEN-API Demo</title>
+  <style>
+    :root {
+      --bg: #f7f9fb;
+      --panel: #ffffff;
+      --border: #dfe3eb;
+      --text: #0f172a;
+      --muted: #6b7280;
+      --accent: #4f46e5;
+      --accent-strong: #4338ca;
+      --radius: 10px;
+      --gap: 14px;
+      --shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+      --mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+      --sans: "Inter", "SF Pro Display", "Segoe UI", system-ui, -apple-system, sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 32px;
+      background: radial-gradient(circle at 20% 20%, #eef2ff, transparent 35%),
+                  radial-gradient(circle at 80% 10%, #e0f2fe, transparent 30%),
+                  var(--bg);
+      font-family: var(--sans);
+      color: var(--text);
+    }
+
+    .shell {
+      width: min(1100px, 100%);
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 24px;
+      box-shadow: var(--shadow);
+      display: grid;
+      grid-template-columns: 340px 1fr;
+      gap: 24px;
+    }
+
+    @media (max-width: 900px) {
+      .shell { grid-template-columns: 1fr; }
+    }
+
+    .column {
+      display: flex;
+      flex-direction: column;
+      gap: var(--gap);
+    }
+
+    .group {
+      padding: 16px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: #fbfcff;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
+    }
+
+    label {
+      display: block;
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: var(--muted);
+    }
+
+    input, textarea, button {
+      width: 100%;
+      font: 15px var(--sans);
+      border-radius: var(--radius);
+      transition: transform 120ms ease, box-shadow 160ms ease, border-color 160ms ease;
+    }
+
+    input, textarea {
+      border: 1px solid var(--border);
+      background: #fff;
+      padding: 11px 12px;
+      color: var(--text);
+    }
+
+    input:focus, textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.12);
+    }
+
+    button {
+      border: 1px solid var(--accent);
+      background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+      color: #fff;
+      font-weight: 600;
+      padding: 11px 12px;
+      cursor: pointer;
+      box-shadow: 0 6px 16px rgba(79, 70, 229, 0.28);
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 10px 22px rgba(79, 70, 229, 0.3);
+    }
+
+    button:active {
+      transform: translateY(0);
+      box-shadow: 0 6px 16px rgba(79, 70, 229, 0.24);
+    }
+
+    button:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .stack { display: flex; flex-direction: column; gap: 10px; }
+
+    .response-card {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      padding: 16px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: #fbfcff;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
+    }
+
+    .response-card header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+      color: var(--muted);
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    .response-box {
+      width: 100%;
+      flex: 1;
+      border: 1px solid var(--border);
+      border-radius: calc(var(--radius) - 2px);
+      background: #fff;
+      padding: 12px;
+      resize: none;
+      font-family: var(--mono);
+      font-size: 13px;
+      color: #111827;
+      line-height: 1.5;
+    }
+
+    .row { display: flex; gap: 10px; align-items: center; }
+
+    .hint {
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: -4px;
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <section class="column" aria-label="Управление методами">
+      <div class="group">
+        <div class="stack">
+          <div>
+            <label for="idInstance">idInstance</label>
+            <input id="idInstance" name="idInstance" placeholder="например, 110110" autocomplete="off" />
+          </div>
+          <div>
+            <label for="apiToken">ApiTokenInstance</label>
+            <input id="apiToken" name="apiToken" placeholder="Ваш ApiTokenInstance" autocomplete="off" />
+          </div>
+          <div class="row">
+            <button id="btnSettings" type="button">getSettings</button>
+            <button id="btnState" type="button">getStateInstance</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="group">
+        <div class="stack">
+          <div>
+            <label for="phoneMessage">Телефон для sendMessage</label>
+            <input id="phoneMessage" name="phoneMessage" placeholder="Например, 77771234567" inputmode="numeric" />
+            <div class="hint">Формат: только цифры, добавится суффикс @c.us автоматически</div>
+          </div>
+          <div>
+            <label for="textMessage">Текст сообщения</label>
+            <textarea id="textMessage" name="textMessage" rows="3" placeholder="Hello World!"></textarea>
+          </div>
+          <button id="btnSendMessage" type="button">sendMessage</button>
+        </div>
+      </div>
+
+      <div class="group">
+        <div class="stack">
+          <div>
+            <label for="phoneFile">Телефон для sendFileByUrl</label>
+            <input id="phoneFile" name="phoneFile" placeholder="Например, 77771234567" inputmode="numeric" />
+            <div class="hint">Формат: только цифры, добавится суффикс @c.us автоматически</div>
+          </div>
+          <div>
+            <label for="fileUrl">URL файла</label>
+            <input id="fileUrl" name="fileUrl" placeholder="https://example.com/image.png" />
+          </div>
+          <button id="btnSendFile" type="button">sendFileByUrl</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="response-card" aria-label="Ответ методов">
+      <header>
+        <span>Ответ</span>
+        <small id="statusLabel" aria-live="polite"></small>
+      </header>
+      <textarea id="response" class="response-box" readonly aria-label="Поле только для чтения с ответом"></textarea>
+    </section>
+  </main>
+
+  <script>
+    const el = (id) => document.getElementById(id);
+    const idInput = el('idInstance');
+    const tokenInput = el('apiToken');
+    const respBox = el('response');
+    const statusLabel = el('statusLabel');
+
+    const btnSettings = el('btnSettings');
+    const btnState = el('btnState');
+    const btnSendMessage = el('btnSendMessage');
+    const btnSendFile = el('btnSendFile');
+
+    const phoneMessage = el('phoneMessage');
+    const textMessage = el('textMessage');
+    const phoneFile = el('phoneFile');
+    const fileUrl = el('fileUrl');
+
+    const formatChatId = (raw) => {
+      const digits = (raw || '').replace(/\D/g, '');
+      return digits ? `${digits}@c.us` : '';
+    };
+
+    const setLoading = (button, isLoading) => {
+      if (!button) return;
+      button.disabled = isLoading;
+      button.dataset.originalText = button.dataset.originalText || button.textContent;
+      button.textContent = isLoading ? '...' : button.dataset.originalText;
+    };
+
+    const showResponse = (data) => {
+      const text = data instanceof Error ? data.message : JSON.stringify(data, null, 2);
+      respBox.value = text;
+    };
+
+    const updateStatus = (msg) => {
+      statusLabel.textContent = msg || '';
+    };
+
+    const baseUrl = () => {
+      const id = idInput.value.trim();
+      const token = tokenInput.value.trim();
+      if (!id || !token) throw new Error('Заполните idInstance и ApiTokenInstance');
+      return `https://api.green-api.com/waInstance${id}`;
+    };
+
+    const request = async ({ path, method = 'GET', body, button }) => {
+      try {
+        setLoading(button, true);
+        updateStatus('');
+        const url = `${baseUrl()}/${path}`;
+        const options = { method, headers: { 'Content-Type': 'application/json' } };
+        if (body) options.body = JSON.stringify(body);
+
+        const res = await fetch(url, options);
+        const json = await res.json().catch(() => ({ message: 'Не удалось разобрать ответ' }));
+        if (!res.ok) throw new Error(json?.message || 'Запрос завершился ошибкой');
+        showResponse(json);
+        updateStatus('Успешно');
+      } catch (err) {
+        showResponse(err instanceof Error ? err : new Error('Неизвестная ошибка'));
+        updateStatus('Ошибка');
+      } finally {
+        setLoading(button, false);
+      }
+    };
+
+    btnSettings.addEventListener('click', () => request({ path: `getSettings/${tokenInput.value.trim()}`, button: btnSettings }));
+    btnState.addEventListener('click', () => request({ path: `getStateInstance/${tokenInput.value.trim()}`, button: btnState }));
+
+    btnSendMessage.addEventListener('click', () => {
+      const chatId = formatChatId(phoneMessage.value);
+      const message = textMessage.value.trim();
+      if (!chatId) return showResponse(new Error('Укажите телефон получателя')); 
+      if (!message) return showResponse(new Error('Введите текст сообщения'));
+      request({
+        path: `sendMessage/${tokenInput.value.trim()}`,
+        method: 'POST',
+        body: { chatId, message },
+        button: btnSendMessage,
+      });
+    });
+
+    btnSendFile.addEventListener('click', () => {
+      const chatId = formatChatId(phoneFile.value);
+      const urlFile = fileUrl.value.trim();
+      if (!chatId) return showResponse(new Error('Укажите телефон получателя'));
+      if (!urlFile) return showResponse(new Error('Укажите URL файла'));
+      const fileName = urlFile.split('/').pop() || 'file';
+      request({
+        path: `sendFileByUrl/${tokenInput.value.trim()}`,
+        method: 'POST',
+        body: { chatId, urlFile, fileName },
+        button: btnSendFile,
+      });
+    });
+  </script>
+</body>
+</html>
